@@ -687,8 +687,8 @@ export const ru = {
   'undo.planClear': 'план очищен',
   'undo.deckRemove': 'удаление показа «{name}»',
 
-  'voice.listen': 'Слушать',
-  'voice.stop': 'Не слушать',
+  'voice.listen': 'Включить листание',
+  'voice.stop': 'Выключить листание',
   'voice.listening': 'Слушаю',
   'voice.loading': 'Читаю голосовой модуль…',
   'voice.asking': 'Спрашиваю сайт…',
@@ -854,7 +854,7 @@ export const ru = {
   'voice.right': 'R',
   'voice.meterHint':
     'Уровень на входе в дБ. Голос лучше держать между −30 и −10; черта — порог тишины',
-  'voice.tune': 'Настройка звука',
+  'voice.tune': 'Настройки',
   'voice.sensitivity': 'Чувствительность',
   'voice.sensitivityHint':
     'Звук тише порога считается тишиной и не слушается. Чем выше чувствительность, тем тише звук, который программа ещё слышит',

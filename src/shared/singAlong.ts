@@ -16,6 +16,12 @@ const NEXT_START = 6
 
 const TAIL = 1500
 
+const STRAY_MS = 4000
+
+const HIT_GAP = 8000
+
+const SONG_WEIGHT = 3
+
 export function normalizeWord(raw: string): string {
   return raw
     .toLowerCase()
@@ -359,7 +365,9 @@ export interface Follow {
 
   since: number
 
-  stray: string[]
+  stray: { word: string; at: number }[]
+
+  last: number
 
   quiet: number
 
@@ -387,6 +395,7 @@ export function followFrom(tape: Tape, slide: number, now: number): Follow {
     hits: 0,
     since: now,
     stray: [],
+    last: now,
     quiet: 0,
     hold: -1,
     holds: 0,
@@ -423,7 +432,8 @@ export function hear(
 
     if (found >= 0) {
       const before = state.at
-      state = { ...state, at: found + 1, hits: state.hits + 1, stray: [], hold: -1, holds: 0 }
+      const hits = now - state.last > HIT_GAP ? 1 : state.hits + 1
+      state = { ...state, at: found + 1, hits, last: now, stray: [], hold: -1, holds: 0 }
 
       const done =
         slide.cue >= 0 &&
@@ -460,7 +470,9 @@ export function hear(
       continue
     }
 
-    state.stray = [...state.stray, word].slice(-STRAY)
+    state.stray = [...state.stray, { word, at: now }]
+      .filter((one) => now - one.at <= STRAY_MS)
+      .slice(-STRAY)
     if (now < state.quiet) continue
 
     const moved = relocate(tape, state, now)
@@ -549,7 +561,7 @@ function relocate(
   state: Follow,
   now: number
 ): { state: Follow; step: Step } | null {
-  const heard = state.stray
+  const heard = state.stray.map((one) => one.word)
   if (heard.length < 2) return null
 
   const current = state.slide
@@ -600,6 +612,7 @@ function relocate(
         hits: ahead ? state.hits + best.hits : best.hits,
         pass,
         since: repeated ? now : state.since,
+        last: now,
         stray: [],
         hold: -1,
         holds: 0
@@ -621,6 +634,7 @@ function relocate(
       hits: best.hits,
       since: now,
       stray: [],
+      last: now,
       quiet: now + QUIET,
       hold: -1,
       holds: 0,
@@ -631,11 +645,15 @@ function relocate(
   }
 }
 
-export function phrasesOf(lines: string[][]): string {
+export function phrasesOf(lines: string[][], speech: string[] = []): string {
   const phrases = new Set<string>()
   for (const line of lines) {
     const phrase = line.join(' ').trim()
     if (phrase) phrases.add(phrase)
   }
-  return JSON.stringify([...phrases, '[unk]'])
+  const song = [...phrases]
+  const sung = new Set(song.flatMap((phrase) => phrase.split(' ')).map(normalizeWord))
+  const other = [...new Set(speech)].filter((word) => !sung.has(normalizeWord(word)))
+  const weighted = Array.from({ length: SONG_WEIGHT }, () => song).flat()
+  return JSON.stringify([...weighted, ...other, '[unk]'])
 }

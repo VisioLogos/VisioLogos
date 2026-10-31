@@ -688,8 +688,8 @@ export const en: Dict = {
   'undo.planClear': 'the plan was cleared',
   'undo.deckRemove': 'deleting the show “{name}”',
 
-  'voice.listen': 'Listen',
-  'voice.stop': 'Stop listening',
+  'voice.listen': 'Turn on slide turning',
+  'voice.stop': 'Turn off slide turning',
   'voice.listening': 'Listening',
   'voice.loading': 'Reading the voice module…',
   'voice.asking': 'Asking the website…',
@@ -855,7 +855,7 @@ export const en: Dict = {
   'voice.right': 'R',
   'voice.meterHint':
     'Input level in dB. Keep the voice between −30 and −10; the mark is the silence threshold',
-  'voice.tune': 'Sound settings',
+  'voice.tune': 'Settings',
   'voice.sensitivity': 'Sensitivity',
   'voice.sensitivityHint':
     'Sound below the threshold counts as silence and is ignored. Higher sensitivity hears quieter sound',

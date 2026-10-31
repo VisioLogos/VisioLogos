@@ -10,6 +10,20 @@ export interface Release {
 
 export const HISTORY: Release[] = [
   {
+    version: '1.0.4',
+    date: '2026-10-31',
+    ru: [
+      'Листание по голосу больше не перелистывает слайды во время проповеди и молитвы: программа отличает речь от пения песни. На записи настоящего служения ложных переключений стало в девять раз меньше, а песни листаются так же, как раньше.',
+      'Слова, услышанные давно, больше не складываются в совпадение: случайное слово из начала проповеди и слово через минуту не переключат слайд.',
+      'Панель «Листать по голосу» стала проще: одна большая кнопка, полоска громкости и одна строка о том, что слышно. Вход, канал, чувствительность, проверка звука и журнал убраны в «Настройки».'
+    ],
+    en: [
+      'Turning slides by voice no longer turns slides during a sermon or prayer: the program tells speech from singing. On a recording of a real service there were nine times fewer false turns, while songs turn just as before.',
+      'Words heard long ago no longer add up to a match: a stray word from the start of a sermon and another a minute later will not turn a slide.',
+      'The “Turn slides by voice” panel is simpler: one large button, a level bar and one line about what is heard. Input, channel, sensitivity, the sound check and the journal moved into “Settings”.'
+    ]
+  },
+  {
     version: '1.0.3',
     date: '2026-10-18',
     ru: [

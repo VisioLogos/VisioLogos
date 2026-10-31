@@ -12,6 +12,7 @@ import {
   type TapeWord,
   type Utterance
 } from '@shared/singAlong'
+import { SPEECH_WORDS } from '@shared/speechWords'
 import { useLive } from './live'
 import { useSongs, type SongSlide } from './songs'
 import { useVoice } from './voice'
@@ -112,7 +113,7 @@ export function startVoiceFollow(): () => void {
     return {
       tape: tapeOf(tapeSlides, early()),
       slides: tapeSlides,
-      grammar: phrases.some((one) => one.length > 0) ? phrasesOf(phrases) : null,
+      grammar: phrases.some((one) => one.length > 0) ? phrasesOf(phrases, SPEECH_WORDS) : null,
       text: textKey(slides),
       song: draft?.id ?? null,
       notes

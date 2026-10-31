@@ -3472,18 +3472,41 @@ button.wide.is-danger {
   margin-left: 6px;
 }
 
-.voice__beta-note {
-  margin: 0;
-  color: var(--text-3);
-  font-size: 11px;
-  line-height: 1.45;
+.voice__main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 34px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.voice__main.is-on {
+  background: var(--glow-2);
+  border-color: var(--edge-strong);
+}
+
+.voice__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-3);
+}
+
+.voice__main.is-on .voice__dot {
+  background: var(--live);
+  box-shadow: 0 0 10px var(--live);
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .voice__hint,
 .voice__step,
 .voice__heard,
 .voice__error {
-  margin: 6px 0 0;
+  margin: 0;
   color: var(--text-3);
   font-size: 11px;
   line-height: 1.45;
@@ -3500,22 +3523,22 @@ button.wide.is-danger {
   text-overflow: ellipsis;
 }
 
-.voice__device {
+.voice__row {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 112px 1fr;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
   color: var(--text-3);
   font-size: 11px;
 }
 
-.voice__device .select {
+.voice__row .select {
   min-width: 0;
 }
 
-.voice__listen {
+.voice__row input[type='range'] {
   width: 100%;
+  margin: 0;
 }
 
 .voice__times {
@@ -3523,7 +3546,7 @@ button.wide.is-danger {
   grid-template-columns: 1fr auto minmax(56px, auto) auto;
   align-items: center;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 2px;
   color: var(--text-3);
   font-size: 11px;
 }
@@ -3561,36 +3584,12 @@ button.wide.is-danger {
 
 .voice__meter {
   display: grid;
-  gap: 4px;
-  margin-top: 8px;
-}
-
-.voice__bar {
-  display: grid;
-  grid-template-columns: 10px 1fr 24px;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-3);
-  font-size: 10px;
-}
-
-.voice__bar i {
-  font-style: normal;
-}
-
-.voice__bar.is-used i {
-  color: var(--text-1);
-}
-
-.voice__bar b {
-  font-weight: 400;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
+  margin-top: 2px;
 }
 
 .voice__track {
   position: relative;
-  height: 6px;
+  height: 4px;
   border-radius: 3px;
   background: var(--glow-1);
 }
@@ -3601,10 +3600,6 @@ button.wide.is-danger {
   border-radius: 3px;
   background: var(--text-2);
   transition: width 80ms linear;
-}
-
-.voice__bar:not(.is-used) .voice__fill {
-  opacity: 0.45;
 }
 
 .voice__fill.is-clip {
@@ -3620,7 +3615,9 @@ button.wide.is-danger {
 }
 
 .voice__more {
-  margin-top: 8px;
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--edge);
   color: var(--text-3);
   font-size: 11px;
 }
@@ -3636,11 +3633,15 @@ button.wide.is-danger {
 
 .voice__more[open] {
   display: grid;
-  gap: 8px;
+  gap: 10px;
+}
+
+.voice__more[open] summary {
+  color: var(--text-2);
 }
 
 .voice__warn {
-  margin: 6px 0 0;
+  margin: 0;
   padding: 6px 8px;
   border-radius: var(--r-small);
   background: var(--live-soft);

@@ -73,10 +73,15 @@ export function VoiceFollow(): React.JSX.Element | null {
 
   const setTimes = (value: number): void => useSongs.getState().setTimes(index, value)
 
+  const pass =
+    following && sung && sung.slide === index && sung.times > 1
+      ? t('voice.pass', { n: sung.pass + 1, of: sung.times })
+      : null
+
   return (
-    <div className="songctl">
+    <div className="songctl voice">
       <div className="songctl__head">
-        <span>
+        <span title={t('voice.betaHint')}>
           {t('voice.panel')}
           <span className="badge voice__beta">{t('voice.beta')}</span>
         </span>
@@ -92,8 +97,6 @@ export function VoiceFollow(): React.JSX.Element | null {
           </b>
         )}
       </div>
-
-      <p className="voice__beta-note">{t('voice.betaHint')}</p>
 
       {!ready ? (
         <div className="voice__need">
@@ -111,23 +114,29 @@ export function VoiceFollow(): React.JSX.Element | null {
         </div>
       ) : (
         <>
-          <div className="control__pair">
-            <button
-              className={`chip voice__listen ${following ? 'is-on' : ''}`}
-              disabled={!hasSong && !following}
-              title={hasSong ? t('voice.hint') : t('voice.needSong')}
-              onClick={() => void voice.toggle()}
-            >
-              {following ? t('voice.stop') : t('voice.listen')}
-            </button>
-            <button
-              className={`chip ${checking ? 'is-on' : ''}`}
-              title={t('voice.checkHint')}
-              onClick={() => void voice.check()}
-            >
-              {checking ? t('voice.checkStop') : t('voice.check')}
-            </button>
-          </div>
+          <button
+            className={`voice__main ${following ? 'is-on' : ''}`}
+            disabled={!hasSong && !following}
+            title={hasSong ? t('voice.hint') : t('voice.needSong')}
+            onClick={() => void voice.toggle()}
+          >
+            <i className="voice__dot" />
+            {following ? t('voice.stop') : t('voice.listen')}
+          </button>
+
+          {on && meter && <Meter meter={meter} gateDb={tuning.gateDb} t={t} />}
+          {on && (
+            <Note
+              meter={meter}
+              channel={tuning.channel}
+              heard={heard}
+              lag={lag}
+              checking={checking}
+              pass={pass}
+              t={t}
+            />
+          )}
+          {on && overAir && <p className="voice__warn">{t('voice.overAir')}</p>}
 
           {hasSong && (
             <div className="voice__times" title={t('voice.timesHint')}>
@@ -152,54 +161,61 @@ export function VoiceFollow(): React.JSX.Element | null {
             </div>
           )}
 
-          {following && sung && sung.slide === index && sung.times > 1 && (
-            <p className="voice__step">{t('voice.pass', { n: sung.pass + 1, of: sung.times })}</p>
-          )}
-
-          <div className="voice__device">
-            <span>{t('voice.device')}</span>
-            <Select
-              value={deviceId ?? ''}
-              onChange={(v) => voice.setDevice(v || null)}
-              options={[
-                { value: '', label: t('voice.deviceDefault') },
-                ...devices.map((one) => ({ value: one.id, label: one.label }))
-              ]}
-            />
-          </div>
-
-          {overAir && <p className="voice__warn">{t('voice.overAir')}</p>}
-          {on && status.using && !chosen && (
-            <p className="voice__step">
-              {t(status.auto ? 'voice.found' : 'voice.using', { name: status.using })}
-            </p>
-          )}
-
-          <div className="voice__device" title={t('voice.channelHint')}>
-            <span>{t('voice.channel')}</span>
-            <div className="segmented segmented--4">
-              {CHANNELS.map((one) => (
-                <button
-                  key={one.value}
-                  className={tuning.channel === one.value ? 'is-active' : ''}
-                  onClick={() => voice.setTuning({ channel: one.value })}
-                >
-                  {t(one.key)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {on && meter && <Meter meter={meter} gateDb={tuning.gateDb} t={t} />}
-          {on && meter && <MeterNote meter={meter} channel={tuning.channel} t={t} />}
-
           <details className="voice__more">
             <summary>{t('voice.tune')}</summary>
 
-            <label className="field" title={t('voice.sensitivityHint')}>
-              <span className="field__head">
-                {t('voice.sensitivity')} <b>{t('voice.gate', { db: tuning.gateDb })}</b>
-              </span>
+            <div className="voice__row">
+              <span>{t('voice.device')}</span>
+              <Select
+                value={deviceId ?? ''}
+                onChange={(v) => voice.setDevice(v || null)}
+                options={[
+                  { value: '', label: t('voice.deviceDefault') },
+                  ...devices.map((one) => ({ value: one.id, label: one.label }))
+                ]}
+              />
+            </div>
+            {on && status.using && !chosen && (
+              <p className="voice__step">
+                {t(status.auto ? 'voice.found' : 'voice.using', { name: status.using })}
+              </p>
+            )}
+
+            <div className="voice__row" title={t('voice.channelHint')}>
+              <span>{t('voice.channel')}</span>
+              <div className="segmented segmented--4">
+                {CHANNELS.map((one) => (
+                  <button
+                    key={one.value}
+                    className={tuning.channel === one.value ? 'is-active' : ''}
+                    onClick={() => voice.setTuning({ channel: one.value })}
+                  >
+                    {t(one.key)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="voice__row" title={t('voice.momentHint')}>
+              <span>{t('voice.moment')}</span>
+              <div className="segmented segmented--2">
+                {MOMENTS.map((one) => (
+                  <button
+                    key={one.value}
+                    className={moment === one.value ? 'is-active' : ''}
+                    onClick={() => voice.setMoment(one.value)}
+                  >
+                    {t(one.key)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <label
+              className="voice__row"
+              title={`${t('voice.sensitivityHint')} · ${t('voice.gate', { db: tuning.gateDb })}`}
+            >
+              <span>{t('voice.sensitivity')}</span>
               <input
                 type="range"
                 min={-GATE_DB.max}
@@ -220,10 +236,11 @@ export function VoiceFollow(): React.JSX.Element | null {
             </label>
 
             {!tuning.autoGain && (
-              <label className="field">
-                <span className="field__head">
-                  {t('voice.gain')} <b>{t('voice.db', { db: signed(tuning.gainDb) })}</b>
-                </span>
+              <label
+                className="voice__row"
+                title={t('voice.db', { db: signed(tuning.gainDb) })}
+              >
+                <span>{t('voice.gain')}</span>
                 <input
                   type="range"
                   min={GAIN_DB.min}
@@ -235,19 +252,21 @@ export function VoiceFollow(): React.JSX.Element | null {
               </label>
             )}
 
-            <div className="field" title={t('voice.momentHint')}>
-              {t('voice.moment')}
-              <div className="segmented segmented--2">
-                {MOMENTS.map((one) => (
-                  <button
-                    key={one.value}
-                    className={moment === one.value ? 'is-active' : ''}
-                    onClick={() => voice.setMoment(one.value)}
-                  >
-                    {t(one.key)}
-                  </button>
-                ))}
-              </div>
+            <div className="control__pair">
+              <button
+                className={`chip ${checking ? 'is-on' : ''}`}
+                title={t('voice.checkHint')}
+                onClick={() => void voice.check()}
+              >
+                {checking ? t('voice.checkStop') : t('voice.check')}
+              </button>
+              <button
+                className="chip"
+                title={t('voice.journalHint')}
+                onClick={() => void window.api.voice.openJournal()}
+              >
+                {t('voice.journal')}
+              </button>
             </div>
 
             <label className="checkbox" title={t('voice.recordHint')}>
@@ -258,30 +277,17 @@ export function VoiceFollow(): React.JSX.Element | null {
               />
               {t('voice.record')}
             </label>
-            <button
-              className="chip"
-              title={t('voice.journalHint')}
-              onClick={() => void window.api.voice.openJournal()}
-            >
-              {t('voice.journal')}
-            </button>
-          </details>
 
-          {on && heard && <p className="voice__heard">{t('voice.heard', { text: heard })}</p>}
-          {on && lag !== null && (checking || lag > SLOW_MS) && (
-            <p className={lag > SLOW_MS ? 'voice__warn' : 'voice__step'}>
-              {t(lag > SLOW_MS ? 'voice.slow' : 'voice.lag', { s: seconds(lag) })}
-            </p>
-          )}
+            {model.bytes > 0 && (
+              <p className="voice__step">
+                {t('voice.installed', { size: weighUpdate(model.bytes) })}
+              </p>
+            )}
+          </details>
         </>
       )}
 
       {error && <p className="voice__error">{t('voice.failed', { why: error })}</p>}
-      {ready && !on && !error && model.bytes > 0 && (
-        <p className="voice__step">
-          {t('voice.installed', { size: weighUpdate(model.bytes) })}
-        </p>
-      )}
     </div>
   )
 }
@@ -295,48 +301,56 @@ function Meter({
   gateDb: number
   t: T
 }): React.JSX.Element {
-  const rows: { name: string; db: number; used: boolean }[] =
-    meter.channels > 1
-      ? [
-          { name: t('voice.left'), db: meter.left, used: meter.use !== 'right' },
-          { name: t('voice.right'), db: meter.right, used: meter.use !== 'left' }
-        ]
-      : [{ name: '', db: meter.left, used: true }]
+  const used = [
+    ...(meter.use !== 'right' ? [meter.left] : []),
+    ...(meter.channels > 1 && meter.use !== 'left' ? [meter.right] : [])
+  ]
+  const db = Math.max(SILENT_DB, ...used)
 
   return (
     <div className="voice__meter" title={t('voice.meterHint')}>
-      {rows.map((row) => (
-        <div key={row.name} className={`voice__bar ${row.used ? 'is-used' : ''}`}>
-          <i>{row.name}</i>
-          <span className="voice__track">
-            <span
-              className={`voice__fill ${meter.clip ? 'is-clip' : ''}`}
-              style={{ width: `${share(row.db)}%` }}
-            />
-            <span className="voice__gate" style={{ left: `${share(gateDb)}%` }} />
-          </span>
-          <b>{row.db <= SILENT_DB + 1 ? '—' : Math.round(row.db)}</b>
-        </div>
-      ))}
+      <span className="voice__track">
+        <span
+          className={`voice__fill ${meter.clip ? 'is-clip' : ''}`}
+          style={{ width: `${share(db)}%` }}
+        />
+        <span className="voice__gate" style={{ left: `${share(gateDb)}%` }} />
+      </span>
     </div>
   )
 }
 
-function MeterNote({
+function Note({
   meter,
   channel,
+  heard,
+  lag,
+  checking,
+  pass,
   t
 }: {
-  meter: VoiceMeter
+  meter: VoiceMeter | null
   channel: VoiceChannel
+  heard: string
+  lag: number | null
+  checking: boolean
+  pass: string | null
   t: T
 }): React.JSX.Element | null {
-  if (meter.clip) return <p className="voice__warn">{t('voice.clip')}</p>
-  if ((meter.lost ?? 0) >= 500) {
-    return <p className="voice__warn">{t('voice.lost', { s: seconds(meter.lost ?? 0) })}</p>
+  if (meter?.clip) return <p className="voice__warn">{t('voice.clip')}</p>
+  if ((meter?.lost ?? 0) >= 500) {
+    return <p className="voice__warn">{t('voice.lost', { s: seconds(meter?.lost ?? 0) })}</p>
   }
-  if (!meter.open) return <p className="voice__step">{t('voice.silent')}</p>
-  if (channel === 'auto' && meter.channels > 1 && meter.use !== 'both') {
+  if (lag !== null && lag > SLOW_MS) {
+    return <p className="voice__warn">{t('voice.slow', { s: seconds(lag) })}</p>
+  }
+  if (meter && !meter.open) return <p className="voice__step">{t('voice.silent')}</p>
+  if (pass) return <p className="voice__step">{pass}</p>
+  if (heard) return <p className="voice__heard">{t('voice.heard', { text: heard })}</p>
+  if (checking && lag !== null) {
+    return <p className="voice__step">{t('voice.lag', { s: seconds(lag) })}</p>
+  }
+  if (meter && channel === 'auto' && meter.channels > 1 && meter.use !== 'both') {
     const side = meter.use === 'left' ? 'voice.onlyLeft' : 'voice.onlyRight'
     return <p className="voice__step">{t(side)}</p>
   }
