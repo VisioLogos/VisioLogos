@@ -1,5 +1,5 @@
 # VisioLogos
-
+Сайт: [visiologos.ru](https://visiologos.ru) — установщик, модули и обратная связь.
 Программа для вывода текстов, песен и презентаций на проектор во время
 церковных служений. Windows и macOS, Electron + React + TypeScript.
 
