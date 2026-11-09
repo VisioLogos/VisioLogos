@@ -74,6 +74,8 @@ export interface SlideStyle {
 
   maxFontSizeVh?: number
   color: string
+  /** False after an explicit color selection; automatic contrast must not override it. */
+  autoTextColor?: boolean
   align: 'left' | 'center' | 'right'
 
   shadow: boolean
@@ -84,7 +86,10 @@ export interface SlideStyle {
   paddingPct: number
   showReference: boolean
 
+  /** Legacy ratio, retained for saved settings. */
   referenceScale: number
+
+  referenceFontSizeVh?: number
 
   referenceFormat: 'full' | 'short' | 'latin'
 

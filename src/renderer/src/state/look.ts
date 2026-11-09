@@ -6,7 +6,7 @@ import type {
   SlideTemplate
 } from '@shared/types'
 import { BUILTIN_BACKGROUNDS, DEFAULT_BACKGROUND } from '@shared/backgrounds'
-import { DEFAULT_STYLE } from '@shared/slide'
+import { DEFAULT_STYLE, migrateReferenceSize } from '@shared/slide'
 import { t } from '@shared/i18n'
 
 export type LookScope = 'bible' | 'texts' | 'songs'
@@ -60,18 +60,24 @@ export const useLook = create<LookStore>((set, get) => ({
       (Object.keys(base) as LookScope[]).map((scope) => [
         scope,
         {
-          style: {
+          style: migrateReferenceSize({
             ...base[scope].style,
             ...legacyStyle,
             ...stored?.[scope]?.style
-          },
+          }),
           background:
             stored?.[scope]?.background ?? legacyBackground ?? base[scope].background
         }
       ])
     ) as Record<LookScope, Look>
 
-    set({ byTab, templates: (saved.templates as SlideTemplate[] | undefined) ?? [] })
+    set({
+      byTab,
+      templates: ((saved.templates as SlideTemplate[] | undefined) ?? []).map((tpl) => ({
+        ...tpl,
+        style: migrateReferenceSize({ ...DEFAULT_STYLE, ...tpl.style })
+      }))
+    })
     await get().loadBackgrounds()
   },
 
@@ -79,7 +85,7 @@ export const useLook = create<LookStore>((set, get) => ({
     const byTab = get().byTab
     const next = {
       ...byTab,
-      [scope]: { ...byTab[scope], style: { ...byTab[scope].style, ...patch } }
+      [scope]: { ...byTab[scope], style: { ...migrateReferenceSize(byTab[scope].style), ...patch } }
     }
     set({ byTab: next })
     void window.api.settings.set('looks', next)

@@ -199,12 +199,12 @@ export function flatLuminance(bg: BackgroundItem['background']): number | null {
   return colors.reduce((sum, c) => sum + luminance(c), 0) / colors.length
 }
 
-export function readableStyleOn<T extends { color: string }>(
+export function readableStyleOn<T extends { color: string; autoTextColor?: boolean }>(
   style: T,
   background: BackgroundItem['background'] | null,
   measured: number | null = null
 ): T {
-  if (!background) return style
+  if (!background || style.autoTextColor === false) return style
 
   const back = flatLuminance(background) ?? measured
   if (back === null || readableOn(style.color, back)) return style

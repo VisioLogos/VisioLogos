@@ -1,8 +1,9 @@
+import { unzipSync, strFromU8 } from 'fflate'
 import { readdir, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { importBibleQuoteModule } from '../src/main/bible/bqParser'
 import { buildBookIndex, formatReference, parseReference, parseReferenceList } from '../src/shared/refs'
-import { freeBlocks, planSlides, DEFAULT_STYLE } from '../src/shared/slide'
+import { freeBlocks, planSlides, DEFAULT_STYLE, referenceSizeVh, migrateReferenceSize } from '../src/shared/slide'
 import { childrenOf, freeName, isInside, newFolder, pathOf, subtree } from '../src/shared/tree'
 import { deckSlides, deckSlideUrl } from '../src/shared/decks'
 import {
@@ -125,7 +126,7 @@ import {
 } from '../src/shared/bibleFile'
 import { pro6, pro7 } from './proPresenterFixtures'
 import { toOpenLyrics, toOpenSong, toPlainText } from '../src/shared/songExport'
-import { pptxOfSongs, songSlides } from '../src/main/pptx'
+import { pptxOfSongs, songSlides, reservePct } from '../src/main/pptx'
 import {
   BUILTIN_BACKGROUNDS,
   colorForLuminance,
@@ -159,6 +160,22 @@ function check(name: string, condition: boolean, detail = ''): void {
 }
 
 async function main(): Promise<void> {
+  const legacyCaption = migrateReferenceSize({ ...DEFAULT_STYLE, fontSizeVh: 10, referenceScale: 0.5 })
+  check('старый размер подписи переносится без потери настройки', referenceSizeVh(legacyCaption) === 5)
+  check('подпись независима от основного текста', referenceSizeVh({ ...legacyCaption, fontSizeVh: 3 }) === 5)
+  check('новый размер подписи сохраняется при миграции', referenceSizeVh(migrateReferenceSize({ ...legacyCaption, referenceFontSizeVh: 2 })) === 2)
+  check('неверный размер подписи заменяется безопасным', referenceSizeVh({ ...DEFAULT_STYLE, referenceFontSizeVh: NaN }) > 0)
+  check('размер подписи по умолчанию не зависит от основного текста', referenceSizeVh(DEFAULT_STYLE) === referenceSizeVh({ ...DEFAULT_STYLE, fontSizeVh: 12 }))
+  const manualColor = { ...DEFAULT_STYLE, color: '#ff0000', autoTextColor: false }
+  check('ручной цвет не заменяется на своём фоне песни', readableStyleOn(manualColor, { kind: 'color', color: '#ff0000' }).color === '#ff0000')
+  check('ручной цвет не заменяется после анализа изображения', readableStyleOn(manualColor, { kind: 'image', src: 'test' }, 0.2).color === '#ff0000')
+  check('автоподбор контраста остаётся доступен', readableStyleOn({ ...manualColor, autoTextColor: true }, { kind: 'color', color: '#ff0000' }).color !== '#ff0000')
+  for (const bodySize of [4, 12]) {
+    const captionStyle = { ...DEFAULT_STYLE, fontSizeVh: bodySize, referenceFontSizeVh: 3 }
+    const bytes = pptxOfSongs([{ lines: ['Текст'], note: 'Подпись', title: false }], { style: captionStyle, background: null, sizes: [bodySize] })
+    const xml = strFromU8(unzipSync(bytes)['ppt/slides/slide1.xml'])
+    check(`размер подписи PPTX независим от текста ${bodySize}`, xml.includes('sz="1620"') && reservePct(captionStyle) === 4.5)
+  }
   const modulesDir = join(process.cwd(), 'modules')
   const entries = (await readdir(modulesDir, { withFileTypes: true })).filter((e) =>
     e.isDirectory()

@@ -623,7 +623,7 @@ export const en: Dict = {
   'control.reference': 'Caption on the slide',
   'control.referenceKind': 'Kind of caption',
   'control.referenceSize': 'Caption size',
-  'control.referenceSizeHint': 'A share of the main text size',
+  'control.referenceSizeHint': 'Percent of slide height, independent of the main text size',
   'control.bg': 'Background',
   'control.bgDark': 'Dark',
   'control.bgLight': 'Light',

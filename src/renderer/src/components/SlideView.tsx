@@ -8,7 +8,7 @@ import type {
   SlideTail
 } from '@shared/types'
 import { backgroundCss, textShadowCss } from '@shared/backgrounds'
-import { DEFAULT_ASPECT, MAX_FONT_VH } from '@shared/slide'
+import { DEFAULT_ASPECT, MAX_FONT_VH, referenceSizeVh } from '@shared/slide'
 import { askFont, useDevicePixelRatio, useFontTick } from '../lib/slideFonts'
 import { MotionLayer } from './MotionLayer'
 
@@ -131,11 +131,7 @@ export function SlideView({
 
   }, [contentKey, style, stageH, unit, fontTick, blackout, hideText])
 
-  const refPx = fontPx
-    ? fontPx * (style?.referenceScale ?? 0.6)
-    : style
-      ? (stageH * style.fontSizeVh * style.referenceScale) / 100
-      : 0
+  const refPx = style ? (stageH * referenceSizeVh(style)) / 100 : 0
 
   const reserve =
     (style?.showReference && slide?.reference) || slide?.tail ? refPx * 1.5 : 0

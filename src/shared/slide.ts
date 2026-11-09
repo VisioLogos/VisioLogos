@@ -31,6 +31,24 @@ export const DEFAULT_STYLE: SlideStyle = {
   dividers: true
 }
 
+/** Caption size is independent of both the chosen and fitted body font. */
+export function referenceSizeVh(style: SlideStyle): number {
+  const value = style.referenceFontSizeVh
+  return typeof value === 'number' && Number.isFinite(value) && value > 0
+    ? value
+    : DEFAULT_STYLE.fontSizeVh * DEFAULT_STYLE.referenceScale
+}
+
+/** Freeze the old ratio once when reading a saved look or template. */
+export function migrateReferenceSize(style: SlideStyle): SlideStyle {
+  if (style.referenceFontSizeVh !== undefined) return style
+  const legacy = style.fontSizeVh * style.referenceScale
+  return {
+    ...style,
+    referenceFontSizeVh: Number.isFinite(legacy) && legacy > 0 ? legacy : referenceSizeVh(style)
+  }
+}
+
 export function freeBlocks(lines: FreeLine[]): SlideBlock[] {
   return lines
     .filter((line) => line.clock || line.text.trim())

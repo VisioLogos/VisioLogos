@@ -2485,6 +2485,8 @@ input[type='range']:hover::-webkit-slider-thumb {
   height: 92px;
   border-radius: var(--r-small);
   cursor: crosshair;
+  touch-action: none;
+  user-select: none;
 
   background:
     linear-gradient(to top, #000, rgba(0, 0, 0, 0)),
@@ -2503,7 +2505,8 @@ input[type='range']:hover::-webkit-slider-thumb {
   pointer-events: none;
 }
 
-.picker__hue {
+input[type='range'].picker__hue,
+input[type='range'].picker__hue:hover {
   height: 10px;
   border-radius: 5px;
   background: linear-gradient(
@@ -2512,7 +2515,8 @@ input[type='range']:hover::-webkit-slider-thumb {
   );
 }
 
-.picker__hue::-webkit-slider-thumb {
+input[type='range'].picker__hue::-webkit-slider-thumb,
+input[type='range'].picker__hue:hover::-webkit-slider-thumb {
   width: 14px;
   height: 14px;
   border: 2px solid #fff;

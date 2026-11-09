@@ -9,7 +9,7 @@ import { officeFont, pptxOfSongs, reservePct, songSlides } from './pptx'
 import { fitFontSizes, renderBackground } from './slideImage'
 import { readSettings } from './settings'
 import { DEFAULT_BACKGROUND } from '@shared/backgrounds'
-import { DEFAULT_STYLE } from '@shared/slide'
+import { DEFAULT_STYLE, migrateReferenceSize } from '@shared/slide'
 import type { Background, SlideStyle } from '@shared/types'
 
 export async function writeSongFile(
@@ -78,7 +78,7 @@ async function songsLook(): Promise<{ style: SlideStyle; background: Background 
   const songs = looks?.songs
 
   return {
-    style: { ...DEFAULT_STYLE, ...songs?.style },
+    style: migrateReferenceSize({ ...DEFAULT_STYLE, ...songs?.style }),
     background: songs?.background ?? DEFAULT_BACKGROUND
   }
 }

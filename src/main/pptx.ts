@@ -2,6 +2,7 @@ import { strToU8, zipSync } from 'fflate'
 import type { SlideStyle, Song } from '@shared/types'
 import { partTitle } from '@shared/songs'
 import { t } from '@shared/i18n'
+import { referenceSizeVh } from '@shared/slide'
 import { shadowHex } from '@shared/backgrounds'
 
 export interface DeckLook {
@@ -13,7 +14,7 @@ export interface DeckLook {
 }
 
 export const reservePct = (style: SlideStyle): number =>
-  style.fontSizeVh * style.referenceScale * 1.5
+  referenceSizeVh(style) * 1.5
 
 const WIDTH = 12192000
 const HEIGHT = 6858000
@@ -117,7 +118,7 @@ function slideXml(slide: SlideText, style: SlideStyle, fontVh: number): string {
           { x: pad, y: HEIGHT - pad - reserve, cx: WIDTH - pad * 2, cy: reserve },
           'b',
           `<a:p><a:pPr algn="r"/><a:r>` +
-            `${runProps(pt(style.fontSizeVh * style.referenceScale), style, 88)}` +
+            `${runProps(pt(referenceSizeVh(style)), style, 88)}` +
             `<a:t>${xml(slide.note)}</a:t></a:r></a:p>`
         )
       : ''

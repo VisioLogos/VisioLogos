@@ -8,7 +8,7 @@ import {
   readableOn
 } from '@shared/backgrounds'
 import type { Key } from '@shared/i18n'
-import { ptOfVh, TEXT_SIZES, vhOfPt } from '@shared/slide'
+import { ptOfVh, referenceSizeVh, migrateReferenceSize, TEXT_SIZES, vhOfPt } from '@shared/slide'
 import { brightnessOf } from '../lib/backLight'
 import { ColorPicker } from './ColorPicker'
 import { MotionLayer } from './MotionLayer'
@@ -181,7 +181,7 @@ function FontTab({ target }: { target: ControlTarget }): React.JSX.Element {
 
   const pickForBackground = async (): Promise<void> => {
     const back = await brightnessOf(background)
-    setStyle({ color: back === null ? '#ffffff' : colorForLuminance(back) })
+    setStyle({ color: back === null ? '#ffffff' : colorForLuminance(back), autoTextColor: true })
   }
 
   return (
@@ -229,7 +229,7 @@ function FontTab({ target }: { target: ControlTarget }): React.JSX.Element {
         {t('control.color')}
         <ColorPicker
           value={style.color}
-          onChange={(hex) => setStyle({ color: hex })}
+          onChange={(hex) => setStyle({ color: hex, autoTextColor: false })}
           onPickForBackground={() => void pickForBackground()}
         />
       </div>
@@ -308,11 +308,11 @@ function TextTab({ target }: { target: ControlTarget }): React.JSX.Element {
           <Slider
             label={t('control.referenceSize')}
             hint={t('control.referenceSizeHint')}
-            value={style.referenceScale}
-            min={0.3}
-            max={1.2}
-            step={0.05}
-            onChange={(v) => setStyle({ referenceScale: v })}
+            value={referenceSizeVh(style)}
+            min={1}
+            max={12}
+            step={0.1}
+            onChange={(v) => setStyle({ referenceFontSizeVh: v })}
           />
           <div className="field">
             {t('control.referenceKind')}
@@ -361,7 +361,7 @@ function BackgroundTab({ target }: { target: ControlTarget }): React.JSX.Element
     setBackground(bg)
 
     const back = await brightnessOf(bg)
-    if (back === null || readableOn(style.color, back)) return
+    if (style.autoTextColor === false || back === null || readableOn(style.color, back)) return
 
     const color = colorForLuminance(back)
     if (color !== style.color) setStyle({ color })
@@ -514,7 +514,7 @@ function TemplatesTab({ target }: { target: ControlTarget }): React.JSX.Element 
               style={{ background: backgroundCss(tpl.background) }}
               title={t('control.templateApply', { name: tpl.name })}
               onClick={() => {
-                target.setStyle(tpl.style)
+                target.setStyle(migrateReferenceSize(tpl.style))
                 target.setBackground(tpl.background)
               }}
             >

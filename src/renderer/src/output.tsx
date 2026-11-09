@@ -1,8 +1,7 @@
 import { StrictMode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import type { LiveState, OutputRole } from '@shared/types'
+import type { LiveState } from '@shared/types'
 import { SlideView } from './components/SlideView'
-import { StageView } from './components/StageView'
 import { preloadSlideFonts } from './lib/slideFonts'
 import './styles.css'
 
@@ -64,17 +63,8 @@ function ready(src: string): Promise<void> {
 
 function Output(): React.JSX.Element {
   const live = useReadyLive()
-  const role = (params.get('role') ?? 'hall') as OutputRole
 
   useRemoteKeys()
-
-  if (role === 'stage') {
-    return (
-      <div className="output output--stage">
-        <StageView live={live} />
-      </div>
-    )
-  }
 
   return (
     <div className="output">

@@ -10,6 +10,20 @@ export interface Release {
 
 export const HISTORY: Release[] = [
   {
+    version: '1.0.5',
+    date: '2026-11-09',
+    ru: [
+      'Исправлена палитра в «Управлении»: цвет выбирается точно и сохраняется, в том числе для песен со своим фоном.',
+      'Экраны «Сцена» и «Трансляция» показывают только содержимое слайда, как экран «Зал».',
+      'Размер подписи на слайде теперь настраивается отдельно от размера основного текста.'
+    ],
+    en: [
+      'Fixed the color picker in Control: selected colors now work and stay saved, including songs with their own backgrounds.',
+      'Stage and Stream now show only slide content, like the Hall screen.',
+      'Slide caption size can now be set independently of the main text size.'
+    ]
+  },
+  {
     version: '1.0.4',
     date: '2026-10-31',
     ru: [

@@ -23,7 +23,7 @@ export function ColorPicker({
   const [hsv, setHsv] = useState(() => hexToHsv(value))
   const [text, setText] = useState(value)
   const areaRef = useRef<HTMLDivElement>(null)
-  const dragging = useRef<'area' | 'hue' | null>(null)
+  const dragging = useRef<number | null>(null)
 
   useEffect(() => {
     if (value.toLowerCase() === hsvToHex(hsv).toLowerCase()) return
@@ -41,7 +41,7 @@ export function ColorPicker({
 
   const fromArea = (e: { clientX: number; clientY: number }): void => {
     const box = areaRef.current?.getBoundingClientRect()
-    if (!box) return
+    if (!box || box.width === 0 || box.height === 0) return
     apply({
       h: hsv.h,
       s: clamp01((e.clientX - box.left) / box.width),
@@ -49,32 +49,33 @@ export function ColorPicker({
     })
   }
 
-  useEffect(() => {
-    if (!dragging.current) return
-    const move = (e: MouseEvent): void => {
-      if (dragging.current === 'area') fromArea(e)
-    }
-    const up = (): void => {
-      dragging.current = null
-    }
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseup', up)
-    return () => {
-      window.removeEventListener('mousemove', move)
-      window.removeEventListener('mouseup', up)
-    }
-  })
-
   return (
     <div className="picker">
       <div
         ref={areaRef}
         className="picker__area"
         style={{ '--hue': hsvToHex({ h: hsv.h, s: 1, v: 1 }) } as React.CSSProperties}
-        onMouseDown={(e) => {
+        onPointerDown={(e) => {
+          if (e.button !== 0 || dragging.current !== null) return
           e.preventDefault()
-          dragging.current = 'area'
+          dragging.current = e.pointerId
+          e.currentTarget.setPointerCapture(e.pointerId)
           fromArea(e)
+        }}
+        onPointerMove={(e) => {
+          if (dragging.current === e.pointerId) fromArea(e)
+        }}
+        onPointerUp={(e) => {
+          if (dragging.current !== e.pointerId) return
+          fromArea(e)
+          dragging.current = null
+          e.currentTarget.releasePointerCapture(e.pointerId)
+        }}
+        onPointerCancel={() => {
+          dragging.current = null
+        }}
+        onLostPointerCapture={() => {
+          dragging.current = null
         }}
       >
         <span

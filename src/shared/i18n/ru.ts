@@ -622,7 +622,7 @@ export const ru = {
   'control.reference': 'Подпись на слайде',
   'control.referenceKind': 'Вид подписи',
   'control.referenceSize': 'Размер подписи',
-  'control.referenceSizeHint': 'Доля от кегля основного текста',
+  'control.referenceSizeHint': 'Процент высоты слайда, независимо от размера основного текста',
   'control.bg': 'Фон',
   'control.bgDark': 'Тёмные',
   'control.bgLight': 'Светлые',

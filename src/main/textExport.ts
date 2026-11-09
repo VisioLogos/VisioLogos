@@ -11,7 +11,7 @@ import { officeFont, pptxOfSongs, reservePct } from './pptx'
 import { fitFontSizes, renderBackground } from './slideImage'
 import { readSettings } from './settings'
 import { DEFAULT_BACKGROUND } from '@shared/backgrounds'
-import { DEFAULT_STYLE } from '@shared/slide'
+import { DEFAULT_STYLE, migrateReferenceSize } from '@shared/slide'
 
 export async function writeTextFile(
   path: string,
@@ -80,7 +80,7 @@ async function textsLook(): Promise<{ style: SlideStyle; background: Background 
   const texts = looks?.texts
 
   return {
-    style: { ...DEFAULT_STYLE, ...texts?.style },
+    style: migrateReferenceSize({ ...DEFAULT_STYLE, ...texts?.style }),
     background: texts?.background ?? DEFAULT_BACKGROUND
   }
 }
